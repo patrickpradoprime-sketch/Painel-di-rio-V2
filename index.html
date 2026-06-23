@@ -136,10 +136,10 @@ function atualizarGrafico(jogos) {
     meuGrafico = new Chart(ctx, {
         type: 'pie',
         data: {
-            labels: Object.keys(contagem), -- ['PC', 'PlayStation', ...]
+            labels: Object.keys(contagem), // ['PC', 'PlayStation', ...]
             datasets: [{
-                data: Object.values(contagem), -- [2, 5, 1, ...]
-                backgroundColor: ['#4bc0c0', '#36a2eb', '#ff6384', '#ffcd56'] -- Cores das fatias
+                data: Object.values(contagem), // [2, 5, 1, ...]
+                backgroundColor: ['#4bc0c0', '#36a2eb', '#ff6384', '#ffcd56'] // Cores das fatias
             }]
         },
         options: {
