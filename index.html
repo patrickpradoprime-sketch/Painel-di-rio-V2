@@ -100,8 +100,9 @@
             .channel('mudancas-jogos')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'jogos' }, (payload) => {
                 adicionarJogoNaTela(payload.new);
-            })
-            .subscribe();
+                carregarJogos(); // Isso força o código a re-puxar os dados e atualizar o gráfico na hora!
+    })
+    .subscribe();
 
         // Inicializadores de eventos
         document.getElementById('btn-salvar').addEventListener('click', gravarJogo);
