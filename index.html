@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compilação Supabase - Lista Suspensa e Realtime</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; background-color: #f9f9f9; }
         .container { max-width: 500px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
@@ -43,7 +44,9 @@
         <h2>Meus Jogos (Tempo Real ⚡)</h2>
         <ul id="lista-jogos"></ul>
     </div>
-
+<div style="max-width: 300px; margin: 20px auto;">
+    <canvas id="graficoPlataformas"></canvas>
+</div>
     <script>
         const SUPABASE_URL = 'https://hunizkqqiaugyodsicct.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1bml6a3FxaWF1Z3lvZHNpY2N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTk1OTUsImV4cCI6MjA5Nzc3NTU5NX0.cdWnZURj4BJWGP6H6fR2r7RSjGK8JqZ0iA4yBJWVqLU';
@@ -99,6 +102,47 @@
         // Inicializadores de eventos
         document.getElementById('btn-salvar').addEventListener('click', gravarJogo);
         carregarJogos();
+        
+        //--------------------GRAFICO--------------------------------------------------------------
+        
+        // Variável global para podermos atualizar o gráfico em tempo real depois
+let meuGrafico = null;
+
+function atualizarGrafico(jogos) {
+    -- 1. TRATAMENTO DE DADOS (A compilação que você pediu)
+    -- Criamos um objeto para contar as plataformas
+    const contagem = { 'PC': 0, 'PlayStation': 0, 'Xbox': 0, 'Nintendo Switch': 0 };
+
+    -- Passamos por cada jogo e somamos +1 na plataforma correspondente
+    jogos.forEach(jogo => {
+        if (contagem[jogo.plataforma] !== undefined) {
+            contagem[jogo.plataforma]++;
+        }
+    });
+
+    -- 2. RENDERIZAÇÃO DO GRÁFICO
+    const ctx = document.getElementById('graficoPlataformas').getContext('2d');
+    
+    -- Se o gráfico já existir (em atualizações realtime), a gente destrói o antigo para criar o novo
+    if (meuGrafico) {
+        meuGrafico.destroy();
+    }
+
+    -- Criando o gráfico de pizza (pie) com os dados tratados
+    meuGrafico = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(contagem), -- ['PC', 'PlayStation', ...]
+            datasets: [{
+                data: Object.values(contagem), -- [2, 5, 1, ...]
+                backgroundColor: ['#4bc0c0', '#36a2eb', '#ff6384', '#ffcd56'] -- Cores das fatias
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+}
     </script>
 </body>
 </html>
