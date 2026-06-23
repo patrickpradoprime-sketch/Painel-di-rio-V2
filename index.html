@@ -1,4 +1,20 @@
-<script>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Supabase</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <h1>Minha Lista de Jogos (Supabase)</h1>
+    <button id="btn-carregar">Carregar Jogos</button>
+    
+    <ul id="lista-jogos">
+        </ul>
+
+   <script>
     // 2. Configurações
     const SUPABASE_URL = 'https://hunizkqqiaugyodsicct.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1bml6a3FxaWF1Z3lvZHNpY2N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTk1OTUsImV4cCI6MjA5Nzc3NTU5NX0.cdWnZURj4BJWGP6H6fR2r7RSjGK8JqZ0iA4yBJWVqLU';
@@ -40,3 +56,5 @@
     // Atrelando a função ao botão
     document.getElementById('btn-carregar').addEventListener('click', buscarJogos);
 </script>
+</body>
+</html>
