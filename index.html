@@ -1,55 +1,42 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste Supabase</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
+<script>
+    // 2. Configurações
+    const SUPABASE_URL = 'https://hunizkqqiaugyodsicct.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1bml6a3FxaWF1Z3lvZHNpY2N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTk1OTUsImV4cCI6MjA5Nzc3NTU5NX0.cdWnZURj4BJWGP6H6fR2r7RSjGK8JqZ0iA4yBJWVqLU';
 
-    <h1>Minha Lista de Jogos (Supabase)</h1>
-    <button id="btn-carregar">Carregar Jogos</button>
-    
-    <ul id="lista-jogos">
-        </ul>
+    // 3. Inicializando com outro nome (Mudei de 'supabase' para 'supabaseClient')
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    <script>
-        // 2. Configuração das credenciais (Substitua com os seus dados do painel do Supabase)
-        const SUPABASE_URL = 'https://hunizkqqiaugyodsicct.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1bml6a3FxaWF1Z3lvZHNpY2N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTk1OTUsImV4cCI6MjA5Nzc3NTU5NX0.cdWnZURj4BJWGP6H6fR2r7RSjGK8JqZ0iA4yBJWVqLU';
+    // Função para buscar os dados da tabela
+    async function buscarJogos() {
+        const listaElement = document.getElementById('lista-jogos');
+        listaElement.innerHTML = 'Carregando...';
 
-        // 3. Inicializando o cliente do Supabase
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // 4. Fazendo a requisição usando a variável corrigida
+        const { data, error } = await supabaseClient
+            .from('jogos')
+            .select('*');
 
-        // Função para buscar os dados da tabela
-        async function buscarJogos() {
-            const listaElement = document.getElementById('lista-jogos');
-            listaElement.innerHTML = 'Carregando...';
-
-            // 4. Fazendo a requisição à tabela 'jogos'
-            // O equivalente em SQL seria: SELECT * FROM jogos;
-            const { data, error } = await supabase
-                .from('jogos')
-                .select('*');
-
-            if (error) {
-                console.error('Erro ao buscar dados:', error);
-                listaElement.innerHTML = 'Erro ao carregar os dados.';
-                return;
-            }
-
-            // 5. Mostrando os dados na tela
-            listaElement.innerHTML = ''; // Limpa o "Carregando..."
-            data.forEach(jogo => {
-                const li = document.createElement('li');
-                li.textContent = `${jogo.titulo} - (${jogo.plataforma})`;
-                listaElement.appendChild(li);
-            });
+        if (error) {
+            console.error('Erro ao buscar dados:', error);
+            listaElement.innerHTML = 'Erro ao carregar os dados.';
+            return;
         }
 
-        // Atrelando a função ao botão
-        document.getElementById('btn-carregar').addEventListener('click', buscarJogos);
-    </script>
-</body>
-</html>
+        // 5. Mostrando os dados na tela
+        listaElement.innerHTML = ''; 
+        
+        if (data.length === 0) {
+            listaElement.innerHTML = 'Nenhum jogo encontrado. A tabela está vazia!';
+            return;
+        }
+
+        data.forEach(jogo => {
+            const li = document.createElement('li');
+            li.textContent = `${jogo.titulo} - (${jogo.plataforma})`;
+            listaElement.appendChild(li);
+        });
+    }
+
+    // Atrelando a função ao botão
+    document.getElementById('btn-carregar').addEventListener('click', buscarJogos);
+</script>
