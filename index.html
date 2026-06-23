@@ -113,26 +113,26 @@
 let meuGrafico = null;
 
 function atualizarGrafico(jogos) {
-    //-- 1. TRATAMENTO DE DADOS (A compilação que você pediu)
-    //-- Criamos um objeto para contar as plataformas
+    // 1. TRATAMENTO DE DADOS (A compilação que você pediu)
+    //Criamos um objeto para contar as plataformas
     const contagem = { 'PC': 0, 'PlayStation': 0, 'Xbox': 0, 'Nintendo Switch': 0 };
 
-    //-- Passamos por cada jogo e somamos +1 na plataforma correspondente
+    // Passamos por cada jogo e somamos +1 na plataforma correspondente
     jogos.forEach(jogo => {
         if (contagem[jogo.plataforma] !== undefined) {
             contagem[jogo.plataforma]++;
         }
     });
 
-    //-- 2. RENDERIZAÇÃO DO GRÁFICO
+    // 2. RENDERIZAÇÃO DO GRÁFICO
     const ctx = document.getElementById('graficoPlataformas').getContext('2d');
     
-    //-- Se o gráfico já existir (em atualizações realtime), a gente destrói o antigo para criar o novo
+    // Se o gráfico já existir (em atualizações realtime), a gente destrói o antigo para criar o novo
     if (meuGrafico) {
         meuGrafico.destroy();
     }
 
-    //-- Criando o gráfico de pizza (pie) com os dados tratados
+    // Criando o gráfico de pizza (pie) com os dados tratados
     meuGrafico = new Chart(ctx, {
         type: 'pie',
         data: {
