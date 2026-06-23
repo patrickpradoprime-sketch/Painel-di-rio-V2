@@ -3,96 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste Supabase - Gravação e Realtime</title>
+    <title>Compilação Supabase - Lista Suspensa e Realtime</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .form-grupo { margin-bottom: 10px; }
-        input { padding: 8px; width: 200px; }
-        button { padding: 8px 15px; cursor: pointer; }
-        ul { margin-top: 20px; }
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f9f9f9; }
+        .container { max-width: 500px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .form-grupo { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { padding: 10px; width: 100%; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { padding: 10px 15px; background-color: #3ecf8e; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
+        button:hover { background-color: #34b27b; }
+        ul { margin-top: 20px; padding-left: 20px; }
+        li { margin-bottom: 8px; padding: 5px; background: #eee; border-radius: 4px; list-style-type: none; }
     </style>
 </head>
 <body>
 
-    <h1>Adicionar Novo Jogo</h1>
-    <div class="form-grupo">
-        <input type="text" id="input-titulo" placeholder="Título do Jogo">
-    </div>
-    <div class="form-grupo">
-        <input type="text" id="input-plataforma" placeholder="Plataforma">
-    </div>
-    <button id="btn-salvar">Gravar no Banco</button>
+    <div class="container">
+        <h1>Cadastrar Jogo</h1>
+        
+        <div class="form-grupo">
+            <label for="input-titulo">Título do Jogo</label>
+            <input type="text" id="input-titulo" placeholder="Ex: Elden Ring">
+        </div>
+        
+        <div class="form-grupo">
+            <label for="select-plataforma">Plataforma</label>
+            <select id="select-plataforma">
+                <option value="">Selecione uma plataforma...</option>
+                <option value="PC">PC</option>
+                <option value="PlayStation">PlayStation</option>
+                <option value="Xbox">Xbox</option>
+                <option value="Nintendo Switch">Nintendo Switch</option>
+            </select>
+        </div>
+        
+        <button id="btn-salvar">Gravar no Banco</button>
 
-    <h2>Lista de Jogos (Atualiza em Tempo Real ⚡)</h2>
-    <ul id="lista-jogos">
-        </ul>
+        <h2>Meus Jogos (Tempo Real ⚡)</h2>
+        <ul id="lista-jogos"></ul>
+    </div>
 
     <script>
-        // Credenciais configuradas corretamente
         const SUPABASE_URL = 'https://hunizkqqiaugyodsicct.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1bml6a3FxaWF1Z3lvZHNpY2N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTk1OTUsImV4cCI6MjA5Nzc3NTU5NX0.cdWnZURj4BJWGP6H6fR2r7RSjGK8JqZ0iA4yBJWVqLU';
 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const listaElement = document.getElementById('lista-jogos');
 
-        // --- 1. FUNÇÃO PARA BUSCAR OS JOGOS EXISTENTES ---
+        // Buscar jogos existentes
         async function carregarJogos() {
             const { data, error } = await supabaseClient.from('jogos').select('*');
-            if (error) {
-                console.error(error);
-                return;
-            }
+            if (error) { console.error(error); return; }
             listaElement.innerHTML = '';
             data.forEach(jogo => adicionarJogoNaTela(jogo));
         }
 
-        // Função auxiliar apenas para desenhar o jogo no HTML
+        // Adicionar elemento visual na tela
         function adicionarJogoNaTela(jogo) {
             const li = document.createElement('li');
-            li.textContent = `${jogo.titulo} - (${jogo.plataforma})`;
+            li.textContent = `🎮 ${jogo.titulo} — 💾 [${jogo.plataforma}]`;
             listaElement.appendChild(li);
         }
 
-        // --- 2. FUNÇÃO PARA GRAVAR (INSERT) NO BANCO ---
+        // Gravar dados no banco
         async function gravarJogo() {
             const titulo = document.getElementById('input-titulo').value;
-            const plataforma = document.getElementById('input-plataforma').value;
+            const plataforma = document.getElementById('select-plataforma').value; // Pega o valor selecionado
 
             if (!titulo || !plataforma) {
-                alert('Preencha todos os campos!');
+                alert('Por favor, preencha o título e escolha uma plataforma!');
                 return;
             }
 
-            // O comando .insert() envia um objeto com os dados para as colunas do banco
             const { error } = await supabaseClient
                 .from('jogos')
                 .insert([{ titulo: titulo, plataforma: plataforma }]);
 
             if (error) {
-                alert('Erro ao salvar: ' + error.message);
+                alert('Erro ao salvar no banco: ' + error.message);
             } else {
-                // Limpa os campos após salvar
                 document.getElementById('input-titulo').value = '';
-                document.getElementById('input-plataforma').value = '';
+                document.getElementById('select-plataforma').value = '';
             }
         }
 
-        // --- 3. CONFIGURAÇÃO DO REALTIME (TEMPO REAL) ---
-        // Aqui dizemos para o Supabase ficar escutando qualquer mudança (INSERT) na tabela 'jogos'
+        // Ouvinte de Tempo Real (Realtime)
         supabaseClient
-            .channel('mudancas-jogos') // Cria um canal de comunicação livre
+            .channel('mudancas-jogos')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'jogos' }, (payload) => {
-                // O 'payload.new' traz os dados da linha que acabou de ser inserida no banco
-                console.log('Novo dado recebido em tempo real:', payload.new);
                 adicionarJogoNaTela(payload.new);
             })
             .subscribe();
 
-
-        // Inicialização
+        // Inicializadores de eventos
         document.getElementById('btn-salvar').addEventListener('click', gravarJogo);
-        carregarJogos(); // Carrega os jogos que já estavam no banco ao abrir a página
+        carregarJogos();
     </script>
 </body>
 </html>
