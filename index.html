@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compilação Supabase - Lista Suspensa e Realtime</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; background-color: #f9f9f9; }
         .container { max-width: 500px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
@@ -44,9 +45,11 @@
         <h2>Meus Jogos (Tempo Real ⚡)</h2>
         <ul id="lista-jogos"></ul>
     </div>
-<div style="max-width: 300px; margin: 20px auto;">
-    <canvas id="graficoPlataformas"></canvas>
-</div>
+    
+    <div style="max-width: 300px; margin: 20px auto;">
+        <canvas id="graficoPlataformas"></canvas>
+    </div>
+    
     <script>
         const SUPABASE_URL = 'https://hunizkqqiaugyodsicct.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1bml6a3FxaWF1Z3lvZHNpY2N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTk1OTUsImV4cCI6MjA5Nzc3NTU5NX0.cdWnZURj4BJWGP6H6fR2r7RSjGK8JqZ0iA4yBJWVqLU';
@@ -60,6 +63,7 @@
             if (error) { console.error(error); return; }
             listaElement.innerHTML = '';
             data.forEach(jogo => adicionarJogoNaTela(jogo));
+            atualizarGrafico(data);
         }
 
         // Adicionar elemento visual na tela
